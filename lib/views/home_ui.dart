@@ -126,10 +126,10 @@ class _HomeUIState extends State<HomeUI> {
                             return ListTile(
                               leading: CachedNetworkImage(
                                 imageUrl: '${urlService}/accountdiry/${snapshop.data[index].mImages}',
+                                width: 50,
+                                height: 50,
                                 imageBuilder: (context, imageProvider){
                                   return Container(
-                                    width: 50,
-                                    height: 50,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: imageProvider,
