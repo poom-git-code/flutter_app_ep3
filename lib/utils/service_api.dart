@@ -5,7 +5,7 @@ import 'package:flutter_app_ep3/models/myaccount.dart';
 //ไฟล์นี้เอาไว้เขียนโค้ดเรียกใช้ service ต่างๆ ที่ server
 
 //สร้างตัวแปรกลางเก็บ uel ของ server ที่เก็บ service ที่เราจะเรียกใช้
-String urlService = "http://10.1.1.113:8080";
+String urlService = "http://192.168.1.45:8080";
 
 //เรียกใช้ service : serviceGetAllMyAccount.php ที่ server
 Future<List<MyAccount>> serviceGetAllMyAccount() async{

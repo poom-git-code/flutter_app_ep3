@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_ep3/models/myaccount.dart';
 import 'package:flutter_app_ep3/utils/service_api.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_app_ep3/views/insert_my_account_ui.dart';
 
 class HomeUI extends StatefulWidget {
   @override
@@ -67,7 +68,14 @@ class _HomeUIState extends State<HomeUI> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){},
+        onPressed: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InsertMyAccountUi(),
+            ),
+          );
+        },
         backgroundColor: Color(0xff457373),
         icon: Icon(
           Icons.add,
@@ -149,7 +157,7 @@ class _HomeUIState extends State<HomeUI> {
                                 changeDeteFormat(snapshop.data[index].mDate)
                               ),
                               trailing: Icon(
-                                Icons.arrow_back_ios,
+                                Icons.arrow_forward_ios,
                               ),
                             );
                           },

@@ -7,7 +7,8 @@ void main(){
       home: HomeUI(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Color(0xff457373)
+        primaryColor: Color(0xff457373),
+        fontFamily: 'Kanit',
       ),
     )
   );
