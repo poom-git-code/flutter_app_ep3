@@ -11,6 +11,7 @@ class MyAccount {
   String mQuantity;
   String mPay;
   String mDate;
+  String imageName;
 
   MyAccount(
       {this.message,
@@ -19,7 +20,9 @@ class MyAccount {
         this.mImages,
         this.mQuantity,
         this.mPay,
-        this.mDate});
+        this.mDate,
+        this.imageName
+      });
 
   MyAccount.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -29,6 +32,7 @@ class MyAccount {
     mQuantity = json['mQuantity'];
     mPay = json['mPay'];
     mDate = json['mDate'];
+    imageName = json['imageName'];
   }
 
   Map<String, dynamic> toJson() {
@@ -40,6 +44,7 @@ class MyAccount {
     data['mQuantity'] = this.mQuantity;
     data['mPay'] = this.mPay;
     data['mDate'] = this.mDate;
+    data['imageName'] = this.imageName;
     return data;
   }
 }

@@ -1,16 +1,29 @@
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_ep3/utils/service_api.dart';
 import 'package:image_picker/image_picker.dart';
 
-class InsertMyAccountUi extends StatefulWidget {
+// ignore: must_be_immutable
+class UpDetMyAccountUi extends StatefulWidget {
+
+  String mId;
+  String mName;
+  String mImages;
+  String mQuantity;
+  String mPay;
+
+  UpDetMyAccountUi(
+      this.mId, this.mName, this.mImages, this.mQuantity, this.mPay);
+
   @override
-  _InsertMyAccountUiState createState() => _InsertMyAccountUiState();
+  _UpDetMyAccountUiState createState() => _UpDetMyAccountUiState();
 }
 
-class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
+class _UpDetMyAccountUiState extends State<UpDetMyAccountUi> {
 
   //สร้างตัว controller ผูกกับ TextField
   TextEditingController mNameCtrl = TextEditingController();
@@ -84,7 +97,7 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                   color: Colors.red,
                 ),
               ),
-          ),
+            ),
           ],
         );
       },
@@ -93,61 +106,61 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
 
   _showWarningDialog(String msg) async{
     await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context){
-        return AlertDialog(
-          title: Center(
-              child: Container(
-                width: double.infinity,
-                color: Colors.red,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+        context: context,
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            title: Center(
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.red,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      'คำเตือน !!!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
+                      ),
+                    ),
+                  ),
+                )),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/mylogo.png',
+                  width: 80,
+                ),
+                SizedBox(height: 15,),
+                Text(
+                  msg,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18
+                  ),
+                ),
+                SizedBox(height: 10,),
+                RaisedButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                  color: Colors.black12,
                   child: Text(
-                    'คำเตือน !!!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white
+                    'ตกลง',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white
+                    ),
                   ),
+                ),
+              ],
             ),
-                ),
-              )),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/images/mylogo.png',
-                width: 80,
-              ),
-              SizedBox(height: 15,),
-              Text(
-                msg,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18
-                ),
-              ),
-              SizedBox(height: 10,),
-              RaisedButton(
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-                color: Colors.black12,
-                child: Text(
-                  'ตกลง',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white
-                  ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Color(0xff457373),
-        );
-      }
+            backgroundColor: Color(0xff457373),
+          );
+        }
     );
   }
 
@@ -192,7 +205,8 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                         //ต้องส่งข้อมูลที่จะบันทึกไปที่ Service insert ไปที่ Server
                         //ผ่านทาง api ไปที่เราจะสร้าง
                         Navigator.pop(context);
-                        String message = await serviceInsertMyAccount(
+                        String message = await serviceUpdateMyAccount(
+                            widget.mId,
                             mNameCtrl.text,
                             _selectImageBase64,
                             mQuantityCtrl.text,
@@ -210,7 +224,7 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                       },
                       color: Colors.black12,
                       child: Text(
-                        'บันทึก',
+                        'บันทึก (แก้ไข)',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -220,7 +234,7 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                     ),
                     SizedBox(width: 20,),
                     RaisedButton(
-                      onPressed: (){
+                      onPressed: () async {
                         Navigator.pop(context);
                       },
                       color: Colors.black12,
@@ -299,18 +313,115 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
     );
   }
 
+  _showConfirmDeleteDialog(String msg) async{
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            title: Center(
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.red,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      'คำเตือน !!!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
+                      ),
+                    ),
+                  ),
+                )),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  msg,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18
+                  ),
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RaisedButton(
+                      onPressed: () async {
+                        //ต้องส่งข้อมูลที่จะบันทึกไปที่ Service insert ไปที่ Server
+                        //ผ่านทาง api ไปที่เราจะสร้าง
+                        Navigator.pop(context);
+                        String message = await serviceDeleteMyAccount(
+                            widget.mId
+                        );
+                        if(message == '1'){
+                          //ถ้าเท่ากับ 1 ให้กลับไปหน้าเเรก
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        }
+                        else{
+                          //แสดง dialog แจ้งบันทึกไม่สำเร็จ
+                          _showInsertResultDialog('ลบไม่สำเร็จ');
+                        }
+                      },
+                      color: Colors.black12,
+                      child: Text(
+                        'ลบ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.green[600]
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 20,),
+                    RaisedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
+                      color: Colors.black12,
+                      child: Text(
+                        'ยกเลิก',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.red[600]
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            backgroundColor: Color(0xff457373),
+          );
+        }
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mNameCtrl.text = widget.mName;
+    mQuantityCtrl.text = widget.mQuantity;
+    mPayCtrl.text = widget.mPay;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Account Diary 2010 (เพิ่ม)',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xffffffff),
-            ),
+          'Account Diary 2010 (แก้ไข/ลบ)',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xffffffff),
           ),
+        ),
         leading: IconButton(
           onPressed: (){
             Navigator.pop(context);
@@ -338,11 +449,43 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                       height: 170,
                       width: 170,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                          width: 2,
-                          color: Colors.pink
-                        )
+                          borderRadius: BorderRadius.circular(100),
+                          border: Border.all(
+                              width: 2,
+                              color: Colors.pink
+                          )
+                      ),
+                    ),
+                    _selectImageName == ''
+                    ?
+                    CachedNetworkImage(
+                      imageUrl: '${urlService}/accountdiry/${widget.mImages}',
+                      width: 150,
+                      height: 150,
+                      imageBuilder: (context, imageProvider){
+                        return Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(100.0),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                    :
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(80),
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: _selectImage == null ? AssetImage('assets/images/mylogo.png') : FileImage(_selectImage)
+                          )
                       ),
                     ),
                     Container(
@@ -350,17 +493,6 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                       height: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(80),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: _selectImage == null ? AssetImage('assets/images/mylogo.png') : FileImage(_selectImage)
-                        )
-                      ),
-                    ),
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(80),
                       ),
                       child: Align(
                         alignment: FractionalOffset.bottomCenter,
@@ -386,12 +518,12 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                     decoration: InputDecoration(
                       labelText: 'รายการที่จ่าย',
                       labelStyle: TextStyle(
-                        color: Colors.teal,
-                        fontSize: 25
+                          color: Colors.teal,
+                          fontSize: 25
                       ),
                       hintText: 'อาหาร ขนม น้ำดื่ม',
                       hintStyle: TextStyle(
-                        color: Colors.grey[400]
+                          color: Colors.grey[400]
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       prefixIcon: Icon(
@@ -434,25 +566,25 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d{0,2}'),
+                        RegExp(r'^\d+\.?\d{0,2}'),
                       )
                     ],
                     decoration: InputDecoration(
-                      labelText: 'เงินที่จ่าย',
-                      labelStyle: TextStyle(
+                        labelText: 'เงินที่จ่าย',
+                        labelStyle: TextStyle(
+                            color: Colors.teal,
+                            fontSize: 25
+                        ),
+                        hintText: '0.00',
+                        hintStyle: TextStyle(
+                            color: Colors.grey[400]
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        prefixIcon: Icon(
+                          Icons.monetization_on,
                           color: Colors.teal,
-                          fontSize: 25
-                      ),
-                      hintText: '0.00',
-                      hintStyle: TextStyle(
-                          color: Colors.grey[400]
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      prefixIcon: Icon(
-                        Icons.monetization_on,
-                        color: Colors.teal,
-                      ),
-                      suffixText: 'บาท'
+                        ),
+                        suffixText: 'บาท'
                     ),
                   ),
                 ),
@@ -473,16 +605,13 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                             else if(mPayCtrl.text.trim().length == 0){
                               _showWarningDialog('ป้อนจำนวณเงินที่จ่ายด้วย !!!');
                             }
-                            else if(_selectImageName.length == 0){
-                              _showWarningDialog('กรุณาเลือกรูปด้วย !!!');
-                            }
                             else{
                               //สีงข้อมูลไปให้ Service insert เพื่อบันทึกลงฐานข้อมูล
-                              _showConfirmDialog('ต้องการบันทึกข้อมูลหรือไม่ !!!');
+                              _showConfirmDialog('ต้องการแก้ไข้ข้อมูลหรือไม่ !!!');
                             }
                           },
                           child: Text(
-                            'บันทึก',
+                            'เเก้ไข้',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
@@ -494,12 +623,26 @@ class _InsertMyAccountUiState extends State<InsertMyAccountUi> {
                       SizedBox(width: 28,),
                       Expanded(
                         child: RaisedButton(
-                          onPressed: (){},
+                          onPressed: () async {
+                            _showConfirmDeleteDialog('ต้องการลบข้อมูลหรือไม่ !!!');
+//                            Navigator.pop(context);
+//                            String message = await serviceDeleteMyAccount(
+//                              widget.mId,
+//                            );
+//                            if(message == '1'){
+//                              //ถ้าเท่ากับ 1 ให้กลับไปหน้าเเรก
+//                              Navigator.of(context).popUntil((route) => route.isFirst);
+//                            }
+//                            else{
+//                              //แสดง dialog แจ้งบันทึกไม่สำเร็จ
+//                              _showInsertResultDialog('บันทึก (แก้ไข้ไม่สำเร็จ)');
+//                            }
+                          },
                           child: Text(
-                            'ยกเลิก',
+                            'ลบ',
                             style: TextStyle(
                                 color: Colors.white,
-                              fontSize: 18
+                                fontSize: 18
                             ),
                           ),
                           color: Colors.red[500],

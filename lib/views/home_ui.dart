@@ -4,6 +4,7 @@ import 'package:flutter_app_ep3/models/myaccount.dart';
 import 'package:flutter_app_ep3/utils/service_api.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_app_ep3/views/insert_my_account_ui.dart';
+import 'package:flutter_app_ep3/views/up_det_my_account_ui.dart';
 
 class HomeUI extends StatefulWidget {
   @override
@@ -74,7 +75,11 @@ class _HomeUIState extends State<HomeUI> {
             MaterialPageRoute(
                 builder: (context) => InsertMyAccountUi(),
             ),
-          );
+          ).then((value){
+            setState(() {
+              getAllMyAccount();
+            });
+          });
         },
         backgroundColor: Color(0xff457373),
         icon: Icon(
@@ -132,6 +137,27 @@ class _HomeUIState extends State<HomeUI> {
                           //แสดงเเต่ะรายการใน listview
                           itemBuilder: (context, index){
                             return ListTile(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context){
+                                      return UpDetMyAccountUi(
+                                        snapshop.data[index].mId,
+                                        snapshop.data[index].mName,
+                                        snapshop.data[index].mImages,
+                                        snapshop.data[index].mQuantity,
+                                        snapshop.data[index].mPay
+
+                                      );
+                                    }
+                                  )
+                                ).then((value){
+                                  setState(() {
+                                    getAllMyAccount();
+                                  });
+                                });
+                              },
                               leading: CachedNetworkImage(
                                 imageUrl: '${urlService}/accountdiry/${snapshop.data[index].mImages}',
                                 width: 50,
